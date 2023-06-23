@@ -794,7 +794,7 @@ def blip(paramsfile='params.ini',resume=False):
     ## make a map if there is a map to be made
     if np.any([plotModel.submodels[sm_name].has_map for sm_name in plotModel.submodel_names]):
         if 'healpy_proj' in params.keys():
-            mapmaker(post_samples, params, parameters, plotModel,  coord=params['healpy_proj'])
+            mapmaker(post_samples, params, parameters, plotModel, coord=params['healpy_proj'], cmap=params['colormap'])
         else:
             mapmaker(post_samples, params, parameters, plotModel)
         

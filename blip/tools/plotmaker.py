@@ -145,9 +145,10 @@ def mapmaker(post, params, parameters, Model, saveto=None, coord=None, cmap=None
 
             omega_map = omega_map/post.shape[0]
             
-            
+            cmap = matplotlib.cm.magma
+
             # generating skymap
-            hp.mollview(omega_map, coord=coord, cmap=cmap, **post_map_kwargs_i)
+            hp.mollview(omega_map, coord=coord, cmap=cmap, title='Marginalized posterior skymap of $\\Omega(f= 1mHz)$', unit="$\\Omega(f= 1mHz)$", **post_map_kwargs_i)
             hp.graticule()
             
             ## switch logging level back to normal so we get our own status updates
@@ -538,7 +539,7 @@ def plotmaker(post, params,parameters, inj, Model, Injection=None,saveto=None):
     cc.configure_truth(color='g', ls='--', alpha=0.7)
 
     if knowTrue:
-        fig = cc.plotter.plot(figsize=(16, 16), truth=truevals)
+        fig = cc.plotter.plot(figsize=(16, 16), truth=truevals) #-smr change these to make corner plot include what it should
     else:
         fig = cc.plotter.plot(figsize=(16, 16))
 
@@ -626,7 +627,8 @@ if __name__ == '__main__':
         Injection = None
     
     
-    post = np.loadtxt(params['out_dir'] + "/post_samples.txt")
+    # post = np.loadtxt(params['out_dir'] + "/post_samples.txt")
+    post = np.loadtxt(args.rundir + "/post_samples.txt")
     
     matplotlib.rcParams.update(matplotlib.rcParamsDefault)
     
@@ -636,7 +638,7 @@ if __name__ == '__main__':
         fitmaker(post, params, parameters, inj, Model, Injection)
     if not args.nomap:
         if 'healpy_proj' in params.keys():
-            mapmaker(post, params, parameters, Model, coord=params['healpy_proj'])
+            mapmaker(post, params, parameters, Model, coord=params['healpy_proj'], cmap=params['colormap'])
         else:
             mapmaker(post, params, parameters, Model)
 
