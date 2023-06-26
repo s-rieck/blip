@@ -638,7 +638,7 @@ if __name__ == '__main__':
         fitmaker(post, params, parameters, inj, Model, Injection)
     if not args.nomap:
         if 'healpy_proj' in params.keys():
-            mapmaker(post, params, parameters, Model, coord=params['healpy_proj'], cmap=params['colormap'])
+            mapmaker(post, params, parameters, Model, coord=self.params['healpy_proj'], cmap=self.params['colormap'])
         else:
             mapmaker(post, params, parameters, Model)
 
