@@ -259,10 +259,10 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
                       'xlabel':'Frequency [Hz]','xlabel_fontsize':None,'ylabel':'PSD [1/Hz]','ylabel_fontsize':None,
                       'xmin':None,'xmax':None,'ymin':None,'ymax':None}
     ## update astro kwargs
-    astro_kwargs = {'title':"Fit vs. Injection (Astrophysical)"} | astro_kwargs
+    astro_kwargs = {'title':"Recovered Fit vs. Simulation (Astrophysical)"} | astro_kwargs
     astro_kwargs = default_kwargs | astro_kwargs
     ## update det kwargs
-    det_kwargs = {'title':"Fit vs. Injection (in Detector)"} | det_kwargs
+    det_kwargs = {'title':"Recovered Fit vs. Simulation (in Detector)"} | det_kwargs
     det_kwargs = default_kwargs | det_kwargs
     
     print("Computing spectral fit median and 95% CI...")
@@ -303,7 +303,7 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
 
     
     ## make the deconvolved spectral fit plot
-    plt.figure(figsize=astro_kwargs['figsize'])
+    dec_fig = plt.figure(figsize=astro_kwargs['figsize'])
     
     ## plot our recovered spectra
     if 'noise' in Model.submodel_names:
@@ -379,13 +379,17 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
         else:
             plt.savefig(params['out_dir'] + '/spectral_fit_astro.png', dpi=astro_kwargs['dpi'])
         print("Astrophysical spectral fit plot saved to " + params['out_dir'] + "spectral_fit_astro.png")
+        
+        with open(args.rundir + '/spectra_dec.pickle', 'wb') as dec_fig_file:
+            pickle.dump(dec_fig,dec_fig_file)
+
         plt.close()
     
     ## plot our recovered convolved spectra if desired
     if plot_convolved:
         model_legend_elements = []
         ymins = []
-        plt.figure(figsize=det_kwargs['figsize'])
+        con_fig = plt.figure(figsize=det_kwargs['figsize'])
 
         start_idx = 0
         ## loop over submodels
@@ -476,6 +480,10 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
         else:
             plt.savefig(params['out_dir'] + '/spectral_fit_detector.png', dpi=det_kwargs['dpi'])
         print("Detector spectral fit plot saved to " + params['out_dir'] + "spectral_fit_detector.png")
+        
+        with open(args.rundir + '/spectra_con.pickle', 'wb') as con_fig_file:
+            pickle.dump(con_fig,con_fig_file)
+        
         plt.close()
  
     

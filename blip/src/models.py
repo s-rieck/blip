@@ -1538,7 +1538,7 @@ class Injection():#geometry,sph_geometry):
         Omega_1mHz = cm.omegaf(1e-3,*spec_args)
         
         Omegamap_pix = Omega_1mHz * cm.skymap/np.sum(cm.skymap)
-        hp.mollview(Omegamap_pix, coord=coord, cmap=self.params['colormap'], title='Injected pixel map $\Omega (f = 1 mHz)$', unit="$\\Omega(f= 1mHz)$")
+        hp.mollview(Omegamap_pix, coord=coord, cmap=self.params['colormap'], title='Simulated pixel map $\Omega (f = 1 mHz)$', unit="$\\Omega(f= 1mHz)$")
         hp.projscatter(3.039486231207189, 5.497787143782138, color='black', marker='*', coord=['E','G'])
         hp.graticule()
         
@@ -1548,7 +1548,7 @@ class Injection():#geometry,sph_geometry):
         
         ## sph map
         Omegamap_inj = Omega_1mHz * cm.sph_skymap
-        hp.mollview(Omegamap_inj, coord=coord, cmap=self.params['colormap'], title='Injected angular distribution map $\Omega (f = 1 mHz)$', unit="$\\Omega(f= 1mHz)$")
+        hp.mollview(Omegamap_inj, coord=coord, cmap=self.params['colormap'], title='Simulated SGWB Angular Distribution Map $\Omega (f = 1 mHz)$', unit="$\\Omega(f= 1mHz)$")
         hp.projscatter(3.039486231207189, 5.497787143782138, color='black', marker='*', coord=['E','G'])
         hp.graticule()
         
