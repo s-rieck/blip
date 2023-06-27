@@ -607,6 +607,11 @@ if __name__ == '__main__':
     parser.add_argument('--nomap', action='store_true', help="Disable skymaps.")
     parser.add_argument('--nocorner', action='store_true', help="Disable corner plots.")
     
+    parser.add_argument('--fitymax_astro', type=float, help='Fitmaker astrophysical plot ymax', default=None)
+    parser.add_argument('--fitymmin_astro', type=float, help='Fitmaker astrophysical plot ymin', default=None)
+    parser.add_argument('--fitymax_det', type=float, help='Fitmaker detector plot ymax', default=None)
+    parser.add_argument('--fitymin_det', type=float, help='Fitmaker detector plot ymin', default=None)
+    
     # execute parser
     args = parser.parse_args()
 
@@ -633,7 +638,9 @@ if __name__ == '__main__':
     if not args.nocorner:
         plotmaker(post, params, parameters, inj, Model, Injection)    
     if not args.nofit:
-        fitmaker(post, params, parameters, inj, Model, Injection)
+        astro_kwargs = {'ymin':args.fitymin_astro,'ymax':args.fitymax_astro}
+        det_kwargs = {'ymin':args.fitymin_det,'ymax':args.fitymax_det}
+        fitmaker(post, params, parameters, inj, Model, Injection, astro_kwargs=astro_kwargs, det_kwargs=det_kwargs)
     if not args.nomap:
         if 'healpy_proj' in params.keys():
             mapmaker(post, params, parameters, Model, coord=params['healpy_proj'])

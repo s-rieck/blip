@@ -118,6 +118,11 @@ class LISA(LISAdata, Model):
         for component in self.Injection.sgwb_component_names:
             h1_gw, h2_gw, h3_gw, times = self.add_sgwb_data(self.Injection.components[component])
             h1_gw, h2_gw, h3_gw = h1_gw[0:N], h2_gw[0:N], h3_gw[0:N]
+            
+            ## population spectra need to be Fourier-transformed and saved at this point for accurate plots of the population psectra as seen in the data
+            if hasattr(self.Injection.components[component],"ispop") and self.Injection.components[component].ispop:
+                pop_r1, pop_r2, pop_r3, pop_fdata, pop_tsegstart, pop_tsegmid = self.tser2fser(h1_gw,h2_gw,h3_gw,times[0:N])
+                self.Injection.components[component].fourier_data = {'r1':pop_r1,'r2':pop_r2,'r3':pop_r3,'fs':pop_fdata}
 
             # Add gravitational-wave time series to noise time-series
             self.h1 = self.h1 + h1_gw

@@ -1,6 +1,6 @@
 import logging
 from contextlib import contextmanager
-
+import numpy as np
 
 '''
 
@@ -165,3 +165,167 @@ def log_manager(level):
         yield
     finally:
         logger.setLevel(current_level)
+
+
+## helper function for getting the population as seen in the spectrum for older runs that a) have an Injection object but b) don't have the pop spec fidelity update
+## this should be depreciated eventually
+def attach_pop_fourier_spectrum(Injection,component_name):
+    '''
+    Function to get the Fourier-transformed, time-smoothed population spectrum as it exists in the data.
+    
+    Arguments
+    -----------
+    Injection (modelspy Injection object) : The BLIP Injection object with an attached population injection component.
+    component_name (str)                  : The desired population component name
+    
+    Returns
+    ------------
+    Injection object with Fourier-transformed population attached.
+    '''
+    
+    injmodel = Injection.components[component_name]
+    
+    params = Injection.params
+    
+ 
+    N = Injection.Npersplice
+    halfN = int(0.5*N)
+    
+    ## compute the astrophysical spectrum
+    injmodel_args = [injmodel.truevals[parameter] for parameter in injmodel.spectral_parameters]
+    
+    Sgw = injmodel.compute_Sgw(Injection.frange,injmodel_args)
+    
+    injmodel.frozen_spectra = Sgw
+    
+    ## the spectrum of the frequecy domain gaussian for ifft
+    norms = np.sqrt(params['fs']*Sgw*N)/2
+
+    ## index array for one segment
+    t_arr = np.arange(N)
+
+    ## the window for splicing
+    splice_win = np.sin(np.pi * t_arr/N)
+
+    ## Loop over splice segments
+    for ii in range(Injection.nsplice):
+        ## move frequency to be the zeroth-axis, then cholesky decomp
+        L_cholesky = norms[:, None, None] *  np.linalg.cholesky(np.moveaxis(injmodel.inj_response_mat[:, :, :, ii], -1, 0))
+        
+        ## generate standard normal complex data first
+        z_norm = np.random.normal(size=(Injection.frange.size, 3)) + 1j * np.random.normal(size=(Injection.frange.size, 3))
+
+        ## The data in z_norm is rescaled into z_scale using L_cholesky
+        z_scale = np.einsum('ijk, ikl -> ijl', L_cholesky, z_norm[:, :, None])[:, :, 0]
+
+        ## The three channels : concatenate with norm at f = 0 to be zero
+        htilda1  = np.concatenate([ [0], z_scale[:, 0]])
+        htilda2  = np.concatenate([ [0], z_scale[:, 1]])
+        htilda3  = np.concatenate([ [0], z_scale[:, 2]])
+
+
+        if ii == 0:
+            # Take inverse fft to get time series data
+            h1 = splice_win * np.fft.irfft(htilda1, N)
+            h2 = splice_win * np.fft.irfft(htilda2, N)
+            h3 = splice_win * np.fft.irfft(htilda3, N)
+
+        else:
+
+            ## First append half-splice worth of zeros
+            h1 = np.append(h1, np.zeros(halfN))
+            h2 = np.append(h2, np.zeros(halfN))
+            h3 = np.append(h3, np.zeros(halfN))
+
+            ## Then add the new splice segment
+            h1[-N:] = h1[-N:] + splice_win * np.fft.irfft(htilda1, N)
+            h2[-N:] = h2[-N:] + splice_win * np.fft.irfft(htilda2, N)
+            h3[-N:] = h3[-N:] + splice_win * np.fft.irfft(htilda3, N)
+
+
+    ## remove the first half and the last half splice.
+    h1, h2, h3 = h1[halfN:-halfN], h2[halfN:-halfN], h3[halfN:-halfN]
+
+    times = params['tstart'] + np.arange(0, params['dur'], 1.0/params['fs'])
+    
+#    h1, h2, h3, times = 
+    N_data = int((params['dur'])*params['fs'])
+    h1, h2, h3 = h1[0:N_data], h2[0:N_data], h3[0:N_data]
+    timearray = times[0:N_data]
+
+    nsegs = int(np.floor(params['dur']/params['seglen'])) -1
+
+    Nperseg=int(params['fs']*params['seglen'])
+
+    '''
+    # Apply a cascading low pass filter
+    b, a = sg.butter(2, 0.4*params['fs']/(params['fs']/2),\
+            btype='lowpass', output='ba')
+    #sos = sg.zpk2sos(zz, pp, kk)
+
+    for ii in range(8):
+        print('low pass filtering ...')
+        h1 = sg.filtfilt(b, a, h1)
+        h2 = sg.filtfilt(b, a, h2)
+        h3 = sg.filtfilt(b, a, h3)
+    '''
+
+    fftfreqs = np.fft.rfftfreq(Nperseg, 1.0/params['fs'])
+
+
+    # Map of spectrum
+    r1 = np.zeros((fftfreqs.size, nsegs), dtype='complex')
+    r2 = np.zeros((fftfreqs.size, nsegs), dtype='complex')
+    r3 = np.zeros((fftfreqs.size, nsegs), dtype='complex')
+
+
+    # Hann Window
+    hwin = np.hanning(Nperseg)
+    win_fact = np.mean(hwin**2)
+
+
+#    zpad = np.zeros(Nperseg)
+
+    ## Initiate time segment arrays
+    tsegstart = np.zeros(nsegs)
+    tsegmid = np.zeros(nsegs)
+
+    # We will use 50% overlapping segments
+    for ii in range(0, nsegs):
+
+        idxmin = int(ii*Nperseg)
+        idxmax = idxmin + Nperseg
+        idxmid = idxmin + int(Nperseg/2)
+        if hwin.size != h1[idxmin:idxmax].size:
+            import pdb; pdb.set_trace()
+
+        r1[:, ii] =   np.fft.rfft(hwin*h1[idxmin:idxmax], axis=0)
+        r2[:, ii] =   np.fft.rfft(hwin*h2[idxmin:idxmax], axis=0)
+        r3[:, ii] =   np.fft.rfft(hwin*h3[idxmin:idxmax], axis=0)
+
+
+        ## There's probably a more pythonic way of doing this, but it'll work for now.
+        tsegstart[ii] = timearray[idxmin]
+        tsegmid[ii] = timearray[idxmid]
+
+    # "Cut" to desired frequencies
+    idx = np.logical_and(fftfreqs >=  params['fmin'] , fftfreqs <=  params['fmax'])
+
+    # Output arrays
+    fdata = fftfreqs[idx]
+
+
+    # Get desired frequencies only
+    # We want to normalize ffts so thier square give the psd
+    # win_fact is to adjust for hann windowing, sqrt(2) for single sided
+    r1 = np.sqrt(2/win_fact)*r1[idx, :]/(params['fs']*np.sqrt(params['seglen']))
+    r2 = np.sqrt(2/win_fact)*r2[idx, :]/(params['fs']*np.sqrt(params['seglen']))
+    r3 = np.sqrt(2/win_fact)*r3[idx, :]/(params['fs']*np.sqrt(params['seglen']))
+    
+    injmodel.fourier_data = {'r1':r1,'r2':r2,'r3':r3,'fs':fdata}
+
+    return Injection
+
+
+
+

@@ -1390,12 +1390,28 @@ class Injection():#geometry,sph_geometry):
         
         ## populations need some finessing due to frequency subtleties                
         if hasattr(cm,"ispop") and cm.ispop:
-            fs = cm.population.frange_true
-            if (fs_new is not None) and not np.array_equal(fs_new,cm.population.frange_true):
-                with log_manager(logging.ERROR):
-                    PSD_interp = interp1d(fs,PSD)
-                    PSD = PSD_interp(fs_new)
-                    fs = fs_new
+            if hasattr(cm,"fourier_data"):
+                ## population convolution special case
+                ## get r1
+                fs = cm.fourier_data['fs']
+                if not imaginary:
+                    PSD = np.mean(np.abs(cm.fourier_data['r1'])**2,axis=1)
+                else:
+                    PSD = 1j * np.mean(np.abs(np.imag(cm.fourier_data['r1']))**2,axis=1)
+#                import pdb; pdb.set_trace()
+                if (fs_new is not None) and not np.array_equal(fs_new,fs):
+                    with log_manager(logging.ERROR):
+                        PSD_interp = interp1d(fs,PSD)
+                        PSD = PSD_interp(fs_new)
+                        fs = fs_new
+                
+            else:        
+                fs = cm.population.frange_true
+                if (fs_new is not None) and not np.array_equal(fs_new,cm.population.frange_true):
+                    with log_manager(logging.ERROR):
+                        PSD_interp = interp1d(fs,PSD)
+                        PSD = PSD_interp(fs_new)
+                        fs = fs_new
         else:
             fs = self.frange
             if fs_new is not None:
