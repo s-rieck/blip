@@ -608,9 +608,13 @@ if __name__ == '__main__':
     parser.add_argument('--nocorner', action='store_true', help="Disable corner plots.")
     
     parser.add_argument('--fitymax_astro', type=float, help='Fitmaker astrophysical plot ymax', default=None)
-    parser.add_argument('--fitymmin_astro', type=float, help='Fitmaker astrophysical plot ymin', default=None)
+    parser.add_argument('--fitymin_astro', type=float, help='Fitmaker astrophysical plot ymin', default=None)
     parser.add_argument('--fitymax_det', type=float, help='Fitmaker detector plot ymax', default=None)
     parser.add_argument('--fitymin_det', type=float, help='Fitmaker detector plot ymin', default=None)
+    parser.add_argument('--fitxmax_astro', type=float, help='Fitmaker astrophysical plot xmax', default=None)
+    parser.add_argument('--fitxmin_astro', type=float, help='Fitmaker astrophysical plot xmin', default=None)
+    parser.add_argument('--fitxmax_det', type=float, help='Fitmaker detector plot xmax', default=None)
+    parser.add_argument('--fitxmin_det', type=float, help='Fitmaker detector plot xmin', default=None)
     
     # execute parser
     args = parser.parse_args()
@@ -638,8 +642,8 @@ if __name__ == '__main__':
     if not args.nocorner:
         plotmaker(post, params, parameters, inj, Model, Injection)    
     if not args.nofit:
-        astro_kwargs = {'ymin':args.fitymin_astro,'ymax':args.fitymax_astro}
-        det_kwargs = {'ymin':args.fitymin_det,'ymax':args.fitymax_det}
+        astro_kwargs = {'ymin':args.fitymin_astro,'ymax':args.fitymax_astro,'xmin':args.fitxmin_astro,'xmax':args.fitxmax_astro}
+        det_kwargs = {'ymin':args.fitymin_det,'ymax':args.fitymax_det,'xmin':args.fitxmin_det,'xmax':args.fitxmax_det}
         fitmaker(post, params, parameters, inj, Model, Injection, astro_kwargs=astro_kwargs, det_kwargs=det_kwargs)
     if not args.nomap:
         if 'healpy_proj' in params.keys():

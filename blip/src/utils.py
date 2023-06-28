@@ -169,14 +169,14 @@ def log_manager(level):
 
 ## helper function for getting the population as seen in the spectrum for older runs that a) have an Injection object but b) don't have the pop spec fidelity update
 ## this should be depreciated eventually
-def attach_pop_fourier_spectrum(Injection,component_name):
+def attach_pop_fourier_spectrum(Injection,component_name='population'):
     '''
     Function to get the Fourier-transformed, time-smoothed population spectrum as it exists in the data.
     
     Arguments
     -----------
     Injection (modelspy Injection object) : The BLIP Injection object with an attached population injection component.
-    component_name (str)                  : The desired population component name
+    component_name (str)                  : The desired population component name (if multiple; default 'population')
     
     Returns
     ------------
