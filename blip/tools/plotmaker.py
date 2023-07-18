@@ -15,6 +15,12 @@ import pickle, argparse
 import logging
 matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 
+matplotlib.rcParams['xtick.labelsize'] = 13.0
+matplotlib.rcParams['ytick.labelsize'] = 13.0
+matplotlib.rcParams['axes.labelsize'] = 16.0
+matplotlib.rcParams['legend.fontsize'] = 14
+matplotlib.rcParams['axes.titlesize'] = 18
+
 
 def mapmaker(post, params, parameters, Model, saveto=None, coord=None, cmap=None, post_map_kwargs={}, med_map_kwargs={}):
     '''
@@ -255,8 +261,8 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
             return
     
     ## build the default plot kwargs
-    default_kwargs = {'figsize':None,'dpi':150,'color_dict':{},'title':None,'title_fontsize':None,
-                      'xlabel':'Frequency [Hz]','xlabel_fontsize':None,'ylabel':'PSD [1/Hz]','ylabel_fontsize':None,
+    default_kwargs = {'figsize':None,'dpi':150,'color_dict':{},'title':None,'title_fontsize':18,
+                      'xlabel':'Frequency [Hz]','xlabel_fontsize':13,'ylabel':'PSD [1/Hz]','ylabel_fontsize':13,
                       'xmin':None,'xmax':None,'ymin':None,'ymax':None}
     ## update astro kwargs
     astro_kwargs = {'title':"Fit vs. Injection (Astrophysical)"} | astro_kwargs
