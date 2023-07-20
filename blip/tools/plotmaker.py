@@ -170,7 +170,7 @@ def mapmaker(post, params, parameters, Model, saveto=None, coord=None, cmap=None
             plt.close()
             
             
-            
+            # skip_median = True #SMR 
 
             ## now do the median skymap
             if not skip_median:
@@ -214,8 +214,8 @@ def mapmaker(post, params, parameters, Model, saveto=None, coord=None, cmap=None
         ## increment start regardless of if we made a map
         start_idx += sm.Npar
     
-    
     return
+    # return omega_map #SMR
     
     
     
@@ -261,7 +261,7 @@ def fitmaker(post,params,parameters,inj,Model,Injection=None,saveto=None,plot_co
             return
     
     ## build the default plot kwargs
-    default_kwargs = {'figsize':None,'dpi':150,'color_dict':{},'title':None,'title_fontsize':18,
+    default_kwargs = {'figsize':None,'dpi':150,'color_dict':{},'title':None,'title_fontsize':16,
                       'xlabel':'Frequency [Hz]','xlabel_fontsize':13,'ylabel':'PSD [1/Hz]','ylabel_fontsize':13,
                       'xmin':None,'xmax':None,'ymin':None,'ymax':None}
     ## update astro kwargs
