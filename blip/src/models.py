@@ -147,38 +147,38 @@ class submodel(geometry,sph_geometry,clebschGordan,instrNoise):
 
         ## assignment of spectrum
         if self.spectral_model_name == 'powerlaw':
-            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
+            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_{ref})$']
             self.omegaf = self.powerlaw_spectrum
             self.fancyname = "Power Law"+submodel_count
             if not injection:
                 self.spectral_prior = self.powerlaw_prior
             else:
                 self.truevals[r'$\alpha$'] = self.injvals['alpha']
-                self.truevals[r'$\log_{10} (\Omega_0)$'] = self.injvals['log_omega0']
+                self.truevals[r'$\log_{10} (\Omega_{ref})$'] = self.injvals['log_omega0']
         elif self.spectral_model_name == 'twothirdspowerlaw':
             ## it may be worth implementing a more general fixed powerlaw model
             ## but this suffices for investigating the effects of the stellar-origin binary background
-            self.spectral_parameters = self.spectral_parameters + [r'$\log_{10} (\Omega_0)$']
+            self.spectral_parameters = self.spectral_parameters + [r'$\log_{10} (\Omega_{ref})$']
             self.omegaf = self.twothirdspowerlaw_spectrum
             self.fancyname = r'$\alpha=2/3$'+" Power Law"+submodel_count
             if not injection:
                 self.spectral_prior = self.fixedpowerlaw_prior
             else:
-                self.truevals[r'$\log_{10} (\Omega_0)$'] = self.injvals['log_omega0']
+                self.truevals[r'$\log_{10} (\Omega_{ref})$'] = self.injvals['log_omega0']
         elif self.spectral_model_name == 'brokenpowerlaw':
-            self.spectral_parameters = self.spectral_parameters + [r'$\alpha_1$',r'$\log_{10} (\Omega_0)$',r'$\alpha_2$',r'$\log_{10} (f_{break})$']
+            self.spectral_parameters = self.spectral_parameters + [r'$\alpha_1$',r'$\log_{10} (\Omega_{ref})$',r'$\alpha_2$',r'$\log_{10} (f_{break})$']
             self.omegaf = self.broken_powerlaw_spectrum
             self.fancyname = "Broken Power Law"+submodel_count
             if not injection:
                 self.spectral_prior = self.broken_powerlaw_prior
             else:
                 self.truevals[r'$\alpha_1$'] = self.injvals['alpha1']
-                self.truevals[r'$\log_{10} (\Omega_0)$'] = self.injvals['log_omega0']
+                self.truevals[r'$\log_{10} (\Omega_{ref})$'] = self.injvals['log_omega0']
                 self.truevals[r'$\alpha_2$'] = self.injvals['alpha2']
                 self.truevals[r'$\log_{10} (f_{break})$'] = self.injvals['log_fbreak']
         
         elif self.spectral_model_name == 'truncatedpowerlaw':
-            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_0)$', r'$\log_{10} (f_{\mathrm{cut}})$']
+            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_{ref})$', r'$\log_{10} (f_{\mathrm{cut}})$']
             self.omegaf = self.truncated_powerlaw_3par_spectrum
             self.fancyname = "Truncated Power Law"+submodel_count
             if not injection:
@@ -188,19 +188,19 @@ class submodel(geometry,sph_geometry,clebschGordan,instrNoise):
                 self.spectral_prior = self.truncated_powerlaw_3par_prior
             else:
                 self.truevals[r'$\alpha$'] = self.injvals['alpha']
-                self.truevals[r'$\log_{10} (\Omega_0)$'] = self.injvals['log_omega0']
+                self.truevals[r'$\log_{10} (\Omega_{ref})$'] = self.injvals['log_omega0']
                 self.truevals[r'$\log_{10} (f_{\mathrm{cut}})$'] = self.injvals['log_fcut']
                 self.truevals[r'$\log_{10} (f_{\mathrm{scale}})$'] = np.log10(4e-4)
         
         elif self.spectral_model_name == 'truncatedpowerlaw4par':
-            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_0)$', r'$\log_{10} (f_{\mathrm{cut}})$',r'$\log_{10} (f_{\mathrm{scale}})$']
+            self.spectral_parameters = self.spectral_parameters + [r'$\alpha$', r'$\log_{10} (\Omega_{ref})$', r'$\log_{10} (f_{\mathrm{cut}})$',r'$\log_{10} (f_{\mathrm{scale}})$']
             self.omegaf = self.truncated_powerlaw_4par_spectrum
             self.fancyname = "4-Parameter Truncated Power Law"+submodel_count
             if not injection:
                 self.spectral_prior = self.truncated_powerlaw_4par_prior
             else:
                 self.truevals[r'$\alpha$'] = self.injvals['alpha']
-                self.truevals[r'$\log_{10} (\Omega_0)$'] = self.injvals['log_omega0']
+                self.truevals[r'$\log_{10} (\Omega_{ref})$'] = self.injvals['log_omega0']
                 self.truevals[r'$\log_{10} (f_{\mathrm{cut}})$'] = self.injvals['log_fcut']
                 self.truevals[r'$\log_{10} (f_{\mathrm{scale}})$'] = self.injvals['log_fscale']
                 
@@ -1426,7 +1426,7 @@ class Injection():#geometry,sph_geometry):
             return PSD
         
     
-    def plot_injected_spectra(self,component_name,fs_new=None,ax=None,convolved=False,legend=False,channels='11',return_PSD=False,scale='log',flim=None,ymins=None,**plt_kwargs):
+    def plot_injected_spectra(self,component_name,fs_new=None,ax=None,convolved=False,legend=False,channels='11',return_PSD=True,scale='log',flim=None,ymins=None,**plt_kwargs):
         '''
         Wrapper to plot the injected spectrum component on the specified matplotlib axes (or current axes if unspecified).
         
