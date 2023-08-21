@@ -586,13 +586,17 @@ def plotmaker(post, params,parameters, inj, Model, Injection=None,saveto=None,co
 
         ax.set_title(label, {'fontsize':18}, loc='left')
 
+    plt.savefig("corners_final.pdf", format="pdf", dpi=200)
+
 
     ## Save posterior
     if saveto is not None:
-        plt.savefig(saveto + 'corners.png', dpi=200)
+        #plt.savefig(saveto + 'corners.png', dpi=200)
+        plt.savefig(saveto + 'corners_final.pdf', format="pdf", dpi=200)
     else:
-        plt.savefig(params['out_dir'] + 'corners.png', dpi=200)
-    print("Posteriors plots printed in " + params['out_dir'] + "corners.png")
+        #plt.savefig(params['out_dir'] + 'corners.png', dpi=200)
+        plt.savefig(saveto + 'corners_final.pdf', format="pdf", dpi=200)
+    print("Posteriors plots printed in " + params['out_dir'] + "corners_final.png")
     plt.close()
     
     if not params['load_data']:    
