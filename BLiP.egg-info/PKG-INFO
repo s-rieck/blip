@@ -19,7 +19,7 @@ This is a fully Bayesian Python package for detecting/characterizing stochastic 
 
 1) We recommend creating a dedicated conda environment for BLIP. Conda is a common python virtual environment manager; if you already have Conda, start at step 2; otherwise [install conda.](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
 
-2) Create an environment. We require Python 3.10 or later:
+2) Create an environment. We require Python 3.10.0:
 
 `conda create --name blip-env python=3.10.0`
 
@@ -32,7 +32,7 @@ This is a fully Bayesian Python package for detecting/characterizing stochastic 
 
 `pip install -e .`
 
-in this directory. It should naturally install all dependencies. 
+in this directory.
 
 ## JAX/NUMPYRO DEV BRANCH NOTE
 As of 5/08/2023, only the git-installed dev version of Numpyro has checkpointing support. See Numpyro docs for git installation instructions. Requires newest version of jax (0.4.3). Numpyro installed through standard channels should work in most cases, but checkpointing will fail.
