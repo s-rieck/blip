@@ -153,9 +153,11 @@ def mapmaker(post, params, parameters, Model, saveto=None, coord=None, cmap=None
 
             ## normalize and cast to real to stop Healpy from complaining (all imaginary components are already zero)
             omega_map = np.real(omega_map/post.shape[0])
-            
+            np.savetxt("./omega_map.txt",omega_map)
+
             # generating skymap
             hp.mollview(omega_map, coord=coord, cmap=cmap, title='Marginalized posterior skymap of $\\Omega(f= 1mHz)$', unit="$\\Omega(f= 1mHz)$", **post_map_kwargs_i)
+            hp.projscatter(3.039486231207189, 5.497787143782138, color='black', marker='*', coord=['E','G'])
             hp.graticule()
             
             ## switch logging level back to normal so we get our own status updates
